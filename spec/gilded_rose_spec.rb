@@ -1,14 +1,9 @@
 require 'gilded_rose'
+require 'update_helper'
 
 describe GildedRose do
   describe '#update_quality' do
-    it 'does not change the name' do
-      items = [Item.new('foo', 0, 0)]
-      GildedRose.new(items).update_quality
-      expect(items[0].name).to eq 'foo'
-    end
-
-    context 'Sulfuras' do
+    context 'sulfuras' do
       it 'checks for quality not changing with days' do
         item = [Item.new('Sulfuras, Hand of Ragnaros', 9, 80)]
         GildedRose.new(item).update_quality
@@ -22,7 +17,7 @@ describe GildedRose do
       end
     end
 
-    context 'Aged Brie' do
+    context 'aged-brie' do
       it "doesn't let the quality get over 50" do
         item = [Item.new('Aged Brie', 9, 50)]
         GildedRose.new(item).update_quality
@@ -45,6 +40,29 @@ describe GildedRose do
         GildedRose.new(items).update_quality
         expect(items[0].sell_in).to eq -2
         expect(items[0].quality).to eq 14
+      end
+    end
+
+    context 'normal-item' do
+      before(:each) do
+        @items = [Item.new('normal', 1, 5)]
+      end
+
+      it 'quality drop by 1 each day' do
+        update(1)
+        expect(@items[0].sell_in).to eq 0
+        expect(@items[0].quality).to eq 4
+      end
+
+      it 'quality drops by double after sell by date' do
+        update(2)
+        expect(@items[0].sell_in).to eq -1
+        expect(@items[0].quality).to eq 2
+      end
+      it 'quality never becomes negative' do
+        update(4)
+        expect(@items[0].sell_in).to eq -3
+        expect(@items[0].quality).to eq 0
       end
     end
   end
